@@ -49,12 +49,15 @@
     (expresion (numero) numero-lit)
     (expresion (texto) texto-lit)
     (expresion (identificador) var-exp)
-    ;(expresion
-     ;(expresion primitiva-binaria expresion)
-     ;primapp-bin-exp)
     (expresion
-     (primitiva-unaria expresion)
+     ("(" expresion primitiva-binaria expresion ")")
+     primapp-bin-exp)
+    (expresion
+     (primitiva-unaria "(" expresion ")")
      primapp-un-exp)
+    (expresion
+     ("Si" expresion "entonces" expresion "sino" expresion "finSi")
+     condicional-exp)
     (primitiva-binaria ("+") primitiva-suma)
     (primitiva-binaria ("~") primitiva-resta)
     (primitiva-binaria ("/") primitiva-div)
@@ -119,27 +122,31 @@
       (numero-lit (numero) numero)
       (texto-lit (txt) txt)
       (var-exp (id) (buscar-variable env id))
-      ;;(primapp-bin-exp (exp1 prim-binaria exp2) (apply-bin-primitive (prim-binaria exp1 exp2)))
-      (primapp-un-exp (prim-unaria exp) (apply-un-primitive (prim-unaria exp)))
+      (primapp-bin-exp (exp1 prim-binaria exp2) (apply-bin-primitive (eval-expression exp1 env) prim-binaria (eval-expression exp2 env)))
+      (primapp-un-exp (prim-unaria exp) (apply-un-primitive prim-unaria (eval-expression exp env)))
+      (condicional-exp (test-exp true-exp false-exp)
+              (if (valor-verdad? (eval-expression test-exp env))
+                  (eval-expression true-exp env)
+                  (eval-expression false-exp env)))
       )))
 
 ;apply-bin-primitive: <expression> <primitiva-binaria> <expression> -> numero
 (define apply-bin-primitive
   (lambda (exp1 prim-binaria exp2)
     (cases primitiva-binaria prim-binaria
-      (primitiva-suma () (+ (eval-expression exp1) (eval-expression exp2)))
-      (primitiva-resta () (- (eval-expression exp1) (eval-expression exp2)))
-      (primitiva-div () (/ (eval-expression exp1) (eval-expression exp2)))
-      (primitiva-multi () (* (eval-expression exp1) (eval-expression exp2)))
-      (primitiva-concat () (cons (eval-expression exp1) (eval-expression exp2))))))
+      (primitiva-suma () (+ exp1 exp2))
+      (primitiva-resta () (- exp1 exp2))
+      (primitiva-div () (/ exp1 exp2))
+      (primitiva-multi () (* exp1 exp2))
+      (primitiva-concat () (cons exp1 exp2)))))
 
 ;apply-un-primitive: <primitiva-unaria> <expression> -> numero
 (define apply-un-primitive
   (lambda (prim-unaria exp)
     (cases primitiva-unaria prim-unaria
-      (primitiva-longitud () (length (eval-expression exp)))
-      (primitiva-add1 () (+ (eval-expression exp) 1))
-      (primitiva-sub1 () (- (eval-expression exp) 1)))))
+      (primitiva-longitud () (length exp))
+      (primitiva-add1 () (+ exp 1))
+      (primitiva-sub1 () (- exp 1)))))
 
 ;definición del tipo de dato ambiente
 (define-datatype environment environment?
@@ -174,6 +181,11 @@
                              (if (number? pos)
                                  (list-ref vals pos)
                                  (buscar-variable env sym)))))))
+
+;valor-verdad?: determina si un valor dado corresponde a un valor booleano falso o verdadero
+(define valor-verdad?
+  (lambda (x)
+    (not (zero? x))))
 
 ;Funciones Auxiliares
 
