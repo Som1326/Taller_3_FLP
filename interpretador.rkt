@@ -17,6 +17,12 @@
 ;;                      primapp-bin-exp (exp1 prim-binaria exp2)
 ;;                  ::= <primitiva-unaria> (<expresion>)
 ;;                      primapp-un-exp (prim-unaria exp)
+;;                  := Si <expresion> entonces <expresion>  sino <expresion> finSI
+;;                      condicional-exp (test-exp true-exp false-exp)
+;;                  := declarar (<identificador> = <expresion> (;)) { <expresion> }
+;;                      variableLocal-exp (ids exps cuerpo)
+;;                  := procedimiento (<identificador>*',') haga <expresion> finProc
+;;                      procedimiento-ex (ids cuero)
 ;;  <primitiva-binaria>     ::= + (primitiva-suma)
 ;;                  ::= ~ (primitiva-resta)
 ;;                  ::= / (primitiva-div)
@@ -58,6 +64,8 @@
     (expresion
      ("Si" expresion "entonces" expresion "sino" expresion "finSi")
      condicional-exp)
+    (expresion ("declarar" "("(arbno identificador "=" expresion ";")")" "{" expresion "}")
+                variablelocal-exp)
     (primitiva-binaria ("+") primitiva-suma)
     (primitiva-binaria ("~") primitiva-resta)
     (primitiva-binaria ("/") primitiva-div)
@@ -128,7 +136,21 @@
               (if (valor-verdad? (eval-expression test-exp env))
                   (eval-expression true-exp env)
                   (eval-expression false-exp env)))
+      (variablelocal-exp (ids exps cuerpo)
+               (let ((args (eval-rands exps env)))
+                 (eval-expression cuerpo
+                                  (extend-env ids args env))))
       )))
+
+; funciones auxiliares para aplicar eval-expression a cada elemento de una 
+; lista de operandos (expresiones)
+(define eval-rands
+  (lambda (rands env)
+    (map (lambda (x) (eval-rand x env)) rands)))
+
+(define eval-rand
+  (lambda (rand env)
+    (eval-expression rand env)))
 
 ;apply-bin-primitive: <expression> <primitiva-binaria> <expression> -> numero
 (define apply-bin-primitive
