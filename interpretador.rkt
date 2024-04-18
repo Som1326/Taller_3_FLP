@@ -23,6 +23,8 @@
 ;;                      variableLocal-exp (ids exps cuerpo)
 ;;                  := procedimiento (<identificador>*',') haga <expresion> finProc
 ;;                      procedimiento-exp (ids cuerpo)
+;;                  := "evaluar" expresion (expresion ",")* finEval
+;;                      app-exp(exp exps) 
 ;;  <primitiva-binaria>     ::= + (primitiva-suma)
 ;;                  ::= ~ (primitiva-resta)
 ;;                  ::= / (primitiva-div)
@@ -64,10 +66,12 @@
     (expresion
      ("Si" expresion "entonces" expresion "sino" expresion "finSi")
      condicional-exp)
-    (expresion ("declarar" "("(arbno identificador "=" expresion ";")")" "{" expresion "}")
+    (expresion ("declarar" "("(separated-list identificador "=" expresion ";")")" "{" expresion "}")
                 variablelocal-exp)
     (expresion ("procedimiento" "(" (separated-list identificador ",") ")" "haga" expresion "finProc")
                 procedimiento-exp)
+    (expresion ( "evaluar" expresion "("(separated-list expresion ",")")" "finEval")
+                app-exp)
     (primitiva-binaria ("+") primitiva-suma)
     (primitiva-binaria ("~") primitiva-resta)
     (primitiva-binaria ("/") primitiva-div)
@@ -144,6 +148,13 @@
                                   (extend-env ids args env))))
       (procedimiento-exp (ids cuerpo)
                 (cerradura ids cuerpo env))
+      (app-exp (exp exps)
+               (let ((proc (eval-expression exp env))
+                     (args (eval-rands exps env)))
+                 (if (procVal? proc)
+                     (apply-procedure proc args)
+                     (eopl:error 'eval-expression
+                                 "Attempt to apply non-procedure ~s" proc))))
       )))
 
 ; funciones auxiliares para aplicar eval-expression a cada elemento de una 
