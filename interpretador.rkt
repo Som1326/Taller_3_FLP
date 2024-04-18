@@ -17,7 +17,7 @@
 ;;                      primapp-bin-exp (exp1 prim-binaria exp2)
 ;;                  ::= <primitiva-unaria> (<expresion>)
 ;;                      primapp-un-exp (prim-unaria exp)
-;;                  := Si <expresion> entonces <expresion>  sino <expresion> finSI
+;;                  := Si <expresion> entonces <expresion>  sino <expresion> finSi
 ;;                      condicional-exp (test-exp true-exp false-exp)
 ;;                  := declarar (<identificador> = <expresion> (;)) { <expresion> }
 ;;                      variableLocal-exp (ids exps cuerpo)
@@ -49,6 +49,8 @@
    (digit (arbno digit)) number)
   (numero
    ("-" digit (arbno digit)) number)
+  (numero
+   (digit (arbno digit) "." (arbno digit)) number)
   (texto
    ("\"" letter (arbno (or letter digit "?")) "\"") symbol)))
 
@@ -182,13 +184,13 @@
       (primitiva-resta () (- exp1 exp2))
       (primitiva-div () (/ exp1 exp2))
       (primitiva-multi () (* exp1 exp2))
-      (primitiva-concat () (cons exp1 exp2)))))
+      (primitiva-concat () (string-append exp1 exp2)))))
 
 ;apply-un-primitive: <primitiva-unaria> <expression> -> numero
 (define apply-un-primitive
   (lambda (prim-unaria exp)
     (cases primitiva-unaria prim-unaria
-      (primitiva-longitud () (length exp))
+      (primitiva-longitud () (string-length exp))
       (primitiva-add1 () (+ exp 1))
       (primitiva-sub1 () (- exp 1)))))
 
