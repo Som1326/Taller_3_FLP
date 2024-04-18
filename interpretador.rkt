@@ -23,8 +23,10 @@
 ;;                      variableLocal-exp (ids exps cuerpo)
 ;;                  := procedimiento (<identificador>*',') haga <expresion> finProc
 ;;                      procedimiento-exp (ids cuerpo)
-;;                  := "evaluar" expresion (expresion ",")* finEval
-;;                      app-exp(exp exps) 
+;;                  := evaluar expresion (expresion ",")* finEval
+;;                      app-exp(exp exps)
+;;                  := recursion {identifier ({identifier}*(,)) = <expression>}* haga <expression>
+;;                      <recursion-exp proc-names idss cuerpos cuerpoRecursion>
 ;;  <primitiva-binaria>     ::= + (primitiva-suma)
 ;;                  ::= ~ (primitiva-resta)
 ;;                  ::= / (primitiva-div)
@@ -72,6 +74,8 @@
                 procedimiento-exp)
     (expresion ( "evaluar" expresion "("(separated-list expresion ",")")" "finEval")
                 app-exp)
+    (expresion ("recursion" (arbno identificador "(" (separated-list identificador ",") ")" "=" expresion)  "haga" expresion) 
+                recursion-exp)
     (primitiva-binaria ("+") primitiva-suma)
     (primitiva-binaria ("~") primitiva-resta)
     (primitiva-binaria ("/") primitiva-div)
@@ -155,6 +159,9 @@
                      (apply-procedure proc args)
                      (eopl:error 'eval-expression
                                  "Attempt to apply non-procedure ~s" proc))))
+      (recursion-exp (proc-names idss cuerpos cuerpoRecursion)
+                  (eval-expression cuerpoRecursion
+                                   (extend-env-recursively proc-names idss cuerpos env)))
       )))
 
 ; funciones auxiliares para aplicar eval-expression a cada elemento de una 
@@ -190,7 +197,11 @@
   (empty-env-record)
   (extended-env-record (syms (list-of symbol?))
                        (vals (list-of scheme-value?))
-                       (env environment?)))
+                       (env environment?))
+  (recursively-extended-env-record (proc-names (list-of symbol?))
+                                   (idss (list-of (list-of symbol?)))
+                                   (cuerpos (list-of expresion?))
+                                   (env environment?)))
 
 (define scheme-value? (lambda (v) #t))
 
@@ -205,7 +216,14 @@
 ;función que crea un ambiente extendido
 (define extend-env
   (lambda (syms vals env)
-    (extended-env-record syms vals env))) 
+    (extended-env-record syms vals env)))
+
+;extend-env-recursively: <list-of symbols> <list-of <list-of symbols>> <list-of expresions> environment -> environment
+;función que crea un ambiente extendido para procedimientos recursivos
+(define extend-env-recursively
+  (lambda (proc-names idss cuerpos old-env)
+    (recursively-extended-env-record
+     proc-names idss cuerpos old-env)))
 
 ;función que busca un símbolo en un ambiente
 (define buscar-variable
@@ -217,7 +235,14 @@
                            (let ((pos (list-find-position sym syms)))
                              (if (number? pos)
                                  (list-ref vals pos)
-                                 (buscar-variable env sym)))))))
+                                 (buscar-variable env sym))))
+      (recursively-extended-env-record (proc-names idss cuerpos old-env)
+                                       (let ((pos (list-find-position sym proc-names)))
+                                         (if (number? pos)
+                                             (cerradura (list-ref idss pos)
+                                                      (list-ref cuerpos pos)
+                                                      env)
+                                             (buscar-variable old-env sym)))))))
 
 ;valor-verdad?: determina si un valor dado corresponde a un valor booleano falso o verdadero
 (define valor-verdad?
