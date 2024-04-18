@@ -22,7 +22,7 @@
 ;;                  := declarar (<identificador> = <expresion> (;)) { <expresion> }
 ;;                      variableLocal-exp (ids exps cuerpo)
 ;;                  := procedimiento (<identificador>*',') haga <expresion> finProc
-;;                      procedimiento-ex (ids cuero)
+;;                      procedimiento-exp (ids cuerpo)
 ;;  <primitiva-binaria>     ::= + (primitiva-suma)
 ;;                  ::= ~ (primitiva-resta)
 ;;                  ::= / (primitiva-div)
@@ -66,6 +66,8 @@
      condicional-exp)
     (expresion ("declarar" "("(arbno identificador "=" expresion ";")")" "{" expresion "}")
                 variablelocal-exp)
+    (expresion ("procedimiento" "(" (separated-list identificador ",") ")" "haga" expresion "finProc")
+                procedimiento-exp)
     (primitiva-binaria ("+") primitiva-suma)
     (primitiva-binaria ("~") primitiva-resta)
     (primitiva-binaria ("/") primitiva-div)
@@ -140,6 +142,8 @@
                (let ((args (eval-rands exps env)))
                  (eval-expression cuerpo
                                   (extend-env ids args env))))
+      (procedimiento-exp (ids cuerpo)
+                (cerradura ids cuerpo env))
       )))
 
 ; funciones auxiliares para aplicar eval-expression a cada elemento de una 
@@ -208,6 +212,20 @@
 (define valor-verdad?
   (lambda (x)
     (not (zero? x))))
+
+;Procedimientos
+(define-datatype procVal procVal?
+  (cerradura
+   (lista-ID (list-of symbol?))
+   (exp expresion?)
+   (amb environment?)))
+
+;apply-procedure: evalua el cuerpo de un procedimientos en el ambiente extendido correspondiente
+(define apply-procedure
+  (lambda (proc args)
+    (cases procVal proc
+      (cerradura (lista-ID exp amb)
+               (eval-expression exp (extend-env lista-ID args amb))))))
 
 ;Funciones Auxiliares
 
