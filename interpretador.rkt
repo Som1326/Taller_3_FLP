@@ -290,3 +290,14 @@
   (cond
     [(null? lst)  0]
     [else   (+ 1 (length (cdr lst)))]))
+
+
+; Punto A 
+
+; Punto B 
+
+; Punto C 
+
+; Punto D
+
+; Punto E
