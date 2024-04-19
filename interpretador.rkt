@@ -307,6 +307,9 @@
 
 ; Punto B 
 
+; recursion @factorial(@x) = Si @x entonces (@x * evaluar @factorial ((@x~1)) finEval) sino 1 finSi haga evaluar @factorial (5) finEval
+; recursion @factorial(@x) = Si @x entonces (@x * evaluar @factorial ((@x~1)) finEval) sino 1 finSi haga evaluar @factorial (10) finEva
+
 ; Punto C 
 
 ; Punto D
