@@ -293,24 +293,33 @@
 
 
 ; Punto A 
+
 ; declarar (
-
-;       @radio=2.5;
-
-;       @areaCirculo= procedimiento (@radio) haga (3.1416*(@radio*@radio)) finProc
-
-;      ) { 
-
-;          evaluar @areaCirculo (@radio) finEval  
-
-;        }
+;   @radio=2.5;
+;   @areaCirculo= procedimiento (@radio) haga (3.1416*(@radio*@radio)) finProc
+;   ){
+;     evaluar @areaCirculo (@radio) finEval
+;     }
 
 ; Punto B 
 
-; recursion @factorial(@x) = Si @x entonces (@x * evaluar @factorial ((@x~1)) finEval) sino 1 finSi haga evaluar @factorial (5) finEval
-; recursion @factorial(@x) = Si @x entonces (@x * evaluar @factorial ((@x~1)) finEval) sino 1 finSi haga evaluar @factorial (10) finEva
+; recursion 
+;   @factorial(@x) = Si @x entonces (@x * evaluar @factorial ((@x~1)) finEval) sino 1 finSi
+; haga
+;   evaluar @factorial (5) finEval
+
+; recursion
+;   @factorial(@x) = Si @x entonces (@x * evaluar @factorial ((@x~1)) finEval) sino 1 finSi
+; haga
+;   evaluar @factorial (10) finEval
+
 
 ; Punto C 
+
+; recursion 
+;   @sumar (@x,@y) = Si @x entonces add1 ( evaluar @sumar (sub1 (@x), @y) finEval) sino @y finSi
+; haga
+;   evaluar @sumar (4, 5) finEval
 
 ; Punto D
 
