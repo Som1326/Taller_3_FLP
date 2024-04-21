@@ -323,6 +323,20 @@
 
 ; Punto D
 
+; %Resta
+; recursion 
+;   @restar (@x,@y) = Si @y entonces sub1 ( evaluar @restar (@x, sub1 (@y)) finEval) sino @x finSi
+; haga  
+;   evaluar @restar (10, 3) finEval
+
+; %Multiplicación
+; recursion 
+;   @sumar (@x,@y) = Si @x entonces add1 ( evaluar @sumar (sub1 (@x), @y) finEval) sino @y finSi 
+;   @multiplicar (@x,@y) = Si @x entonces evaluar @sumar ( evaluar @multiplicar (sub1 (@x), @y) finEval, @y) finEval sino 0 finSi 
+; haga 
+;   evaluar @multiplicar (10, 3) finEval
+
+
 ; Punto E
 
 ; Punto F
