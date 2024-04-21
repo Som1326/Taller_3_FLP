@@ -364,3 +364,23 @@
 ; }
 
 ; Punto F
+
+; declarar (
+;   @saludo="Hola:";
+;   @Sebas="Sebastian";
+;   @Frank="Franklin";
+; ){
+;   declarar (
+;     @integrantes=procedimiento() haga (@Sebas concat ("-y-" concat @Frank)) finProc;
+;   ){
+;     declarar (
+;       @saludar=procedimiento(@procedimiento) haga procedimiento() haga (@saludo concat evaluar @procedimiento() finEval) finProc finProc;
+;     ){
+;       declarar (
+;         @decorate=procedimiento(@mensaje) haga (evaluar evaluar @saludar (@integrantes) finEval () finEval concat @mensaje) finProc;
+;       ){
+;         evaluar @decorate("-ProfesoresFLP") finEval
+;       }
+;     }
+;   }
+; }
