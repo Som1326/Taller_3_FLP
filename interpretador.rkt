@@ -295,12 +295,13 @@
     [(null? lst)  0]
     [else   (+ 1 (length (cdr lst)))]))
 
+(interpretador)
 
 ; Punto A 
 
 ; declarar (
 ;   @radio=2.5;
-;   @areaCirculo= procedimiento (@radio) haga (3.1416*(@radio*@radio)) finProc
+;   @areaCirculo= procedimiento (@radio) haga (3.1416*(@radio*@radio)) finProc;
 ;   ){
 ;     evaluar @areaCirculo (@radio) finEval
 ;     }
