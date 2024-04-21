@@ -44,15 +44,19 @@
   (comentario
    ("%" (arbno (not #\newline))) skip)
   (identificador
-   ("@" letter (arbno (or letter digit "?"))) symbol)
+   ("@" letter (arbno (or letter digit))) symbol)
   (numero
    (digit (arbno digit)) number)
   (numero
    ("-" digit (arbno digit)) number)
   (numero
    (digit (arbno digit) "." (arbno digit)) number)
+  (numero
+   ("-" digit (arbno digit) "." (arbno digit)) number)
   (texto
-   ("\"" letter (arbno (or letter digit "?")) "\"") symbol)))
+   ("\"" (arbno (or letter digit whitespace "," ":" "-" "?")) "\"") string)
+  (espacio
+   (whitespace) skip)))
 
 ;Especificación Sintáctica (gramática)
 
@@ -70,7 +74,7 @@
     (expresion
      ("Si" expresion "entonces" expresion "sino" expresion "finSi")
      condicional-exp)
-    (expresion ("declarar" "("(separated-list identificador "=" expresion ";")")" "{" expresion "}")
+    (expresion ("declarar" "("(arbno identificador "=" expresion ";")")" "{" expresion "}")
                 variablelocal-exp)
     (expresion ("procedimiento" "(" (separated-list identificador ",") ")" "haga" expresion "finProc")
                 procedimiento-exp)
@@ -140,7 +144,7 @@
   (lambda (expre env)
     (cases expresion expre
       (numero-lit (numero) numero)
-      (texto-lit (txt) txt)
+      (texto-lit (txt) (substring txt 1 (- (string-length txt) 1)))
       (var-exp (id) (buscar-variable env id))
       (primapp-bin-exp (exp1 prim-binaria exp2) (apply-bin-primitive (eval-expression exp1 env) prim-binaria (eval-expression exp2 env)))
       (primapp-un-exp (prim-unaria exp) (apply-un-primitive prim-unaria (eval-expression exp env)))
@@ -297,7 +301,7 @@
 
 ;       @radio=2.5;
 
-;       @areaCirculo= procedimiento (@radio) haga (3.1416*(@radio*@radio)) finProc
+;       @areaCirculo= procedimiento (@radio) haga (3.1416*(@radio*@radio)) finProc;
 
 ;      ) { 
 
